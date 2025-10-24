@@ -42,11 +42,11 @@ export const createSheet = async (req, res) => {
     // Generate unique sheet ID
     const sheetId = `${companyName}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
-    // Assign unique IDs to each data item
+    // Assign unique IDs and default state to each data item
     const dataWithIds = Array.isArray(data) ? data.map(item => ({
       ...item,
       _id: `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      state: item.state || 'New',
+      state: item.state || 'New', // Add default state
       createdAt: new Date()
     })) : [];
 
@@ -81,11 +81,11 @@ export const uploadExcel = async (req, res) => {
       return res.status(400).json({ message: 'Valid data array is required' });
     }
 
-    // Assign unique IDs to each item
+    // Assign unique IDs and default state to each item
     const dataWithIds = data.map(item => ({
       ...item,
       _id: item._id || `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      state: item.state || 'New',
+      state: item.state || 'New', // Add default state
       createdAt: item.createdAt || new Date()
     }));
 
@@ -98,7 +98,7 @@ export const uploadExcel = async (req, res) => {
     sheet.data = dataWithIds;
     sheet.uploadedBy = uploadedBy || sheet.uploadedBy;
     sheet.sourceType = sourceType || sheet.sourceType;
-    sheet.sourceUrl = sourceUrl || sheet.sourceUrl; 
+    sheet.sourceUrl = sourceUrl || sheet.sourceUrl;
     sheet.updatedAt = new Date();
 
     await sheet.save();
@@ -142,7 +142,7 @@ export const addLead = async (req, res) => {
     const newLead = {
       ...leadData,
       _id: `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      state: leadData.state || 'New',
+      state: leadData.state || 'New', // Ensure state defaults to 'New'
       createdAt: new Date()
     };
 
