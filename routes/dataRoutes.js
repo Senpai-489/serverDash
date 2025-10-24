@@ -7,6 +7,7 @@ import {
   deleteSheet,
   addLead,
   deleteLead,
+  updateLeadState,
   fetchSheetUrl,
   getExcelData
 } from '../controllers/dataController.js';
@@ -23,6 +24,7 @@ router.delete('/deleteSheet/:sheetId', deleteSheet); // Delete sheet
 // Lead management
 router.post('/addLead/:sheetId', addLead); // Add lead to sheet
 router.delete('/deleteLead/:sheetId/:leadId', deleteLead); // Delete lead from sheet
+router.patch('/updateLeadState/:sheetId/:leadId', updateLeadState); // Update lead state
 
 // Utility
 router.post('/fetchSheetData', fetchSheetUrl); // Fetch data from URL

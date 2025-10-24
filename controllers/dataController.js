@@ -46,6 +46,7 @@ export const createSheet = async (req, res) => {
     const dataWithIds = Array.isArray(data) ? data.map(item => ({
       ...item,
       _id: `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      state: item.state || 'New',
       createdAt: new Date()
     })) : [];
 
@@ -84,6 +85,7 @@ export const uploadExcel = async (req, res) => {
     const dataWithIds = data.map(item => ({
       ...item,
       _id: item._id || `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      state: item.state || 'New',
       createdAt: item.createdAt || new Date()
     }));
 
@@ -140,6 +142,7 @@ export const addLead = async (req, res) => {
     const newLead = {
       ...leadData,
       _id: `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      state: leadData.state || 'New',
       createdAt: new Date()
     };
 
@@ -179,6 +182,44 @@ export const deleteLead = async (req, res) => {
   } catch (error) {
     console.error('Error deleting lead:', error);
     res.status(500).json({ message: 'Error deleting lead', error: error.message });
+  }
+};
+
+// Update lead state
+export const updateLeadState = async (req, res) => {
+  try {
+    const { sheetId, leadId } = req.params;
+    const { state } = req.body;
+
+    if (!state) {
+      return res.status(400).json({ message: 'State is required' });
+    }
+
+    const validStates = ['New', 'In Conversation', 'Converted', 'Dead Lead'];
+    if (!validStates.includes(state)) {
+      return res.status(400).json({ message: 'Invalid state value' });
+    }
+
+    const sheet = await ExcelData.findOne({ sheetId });
+    
+    if (!sheet) {
+      return res.status(404).json({ message: 'Sheet not found' });
+    }
+
+    const lead = sheet.data.find(item => item._id === leadId);
+    
+    if (!lead) {
+      return res.status(404).json({ message: 'Lead not found' });
+    }
+
+    lead.state = state;
+    sheet.updatedAt = new Date();
+    await sheet.save();
+
+    res.status(200).json({ message: 'Lead state updated successfully', lead });
+  } catch (error) {
+    console.error('Error updating lead state:', error);
+    res.status(500).json({ message: 'Error updating lead state', error: error.message });
   }
 };
 
