@@ -14,7 +14,7 @@ const databaseURL = process.env.MONGODB_URI
 
 app.use(cors({
     origin: ["https://luxury-vibes-dashboard.vercel.app","http://localhost:3000"],
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     credentials: true,
 }));
 app.use(express.json());

@@ -191,6 +191,8 @@ export const updateLeadState = async (req, res) => {
     const { sheetId, leadId } = req.params;
     const { state } = req.body;
 
+    console.log('Updating lead state:', { sheetId, leadId, state });
+
     if (!state) {
       return res.status(400).json({ message: 'State is required' });
     }
@@ -206,17 +208,26 @@ export const updateLeadState = async (req, res) => {
       return res.status(404).json({ message: 'Sheet not found' });
     }
 
-    const lead = sheet.data.find(item => item._id === leadId);
+    const leadIndex = sheet.data.findIndex(item => item._id === leadId);
     
-    if (!lead) {
+    if (leadIndex === -1) {
       return res.status(404).json({ message: 'Lead not found' });
     }
 
-    lead.state = state;
+    // Update the lead state directly
+    sheet.data[leadIndex].state = state;
     sheet.updatedAt = new Date();
+    
+    // Mark the array as modified for Mongoose to detect changes
+    sheet.markModified('data');
+    
     await sheet.save();
 
-    res.status(200).json({ message: 'Lead state updated successfully', lead });
+    console.log('Lead state updated successfully');
+    res.status(200).json({ 
+      message: 'Lead state updated successfully', 
+      lead: sheet.data[leadIndex] 
+    });
   } catch (error) {
     console.error('Error updating lead state:', error);
     res.status(500).json({ message: 'Error updating lead state', error: error.message });
