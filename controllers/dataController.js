@@ -348,16 +348,3 @@ export const appendLeads = async (req, res) => {
   }
 };
 
-export { 
-  getAllSheets, 
-  getSheetData, 
-  createSheet, 
-  uploadExcel, 
-  deleteSheet, 
-  addLead, 
-  deleteLead, 
-  updateLeadState,
-  appendLeads,  // Add this
-  fetchSheetUrl, 
-  getExcelData 
-};
