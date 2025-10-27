@@ -299,3 +299,65 @@ export const getExcelData = async (req, res) => {
     res.status(500).json({ message: 'Error fetching data', error: error.message });
   }
 };
+
+// Append new leads to existing sheet (for refresh functionality)
+export const appendLeads = async (req, res) => {
+  try {
+    const { sheetId, newLeads, uploadedBy } = req.body;
+
+    if (!sheetId) {
+      return res.status(400).json({ message: 'Sheet ID is required' });
+    }
+
+    if (!Array.isArray(newLeads) || newLeads.length === 0) {
+      return res.status(400).json({ message: 'Valid new leads array is required' });
+    }
+
+    const sheet = await ExcelData.findOne({ sheetId });
+    
+    if (!sheet) {
+      return res.status(404).json({ message: 'Sheet not found' });
+    }
+
+    // Assign unique IDs and default state to each new lead
+    const leadsWithIds = newLeads.map(item => ({
+      ...item,
+      _id: `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      state: item.state || 'New',
+      createdAt: new Date()
+    }));
+
+    // Append to existing data
+    sheet.data.push(...leadsWithIds);
+    sheet.uploadedBy = uploadedBy || sheet.uploadedBy;
+    sheet.updatedAt = new Date();
+
+    // Mark as modified for Mongoose
+    sheet.markModified('data');
+    
+    await sheet.save();
+
+    res.status(200).json({ 
+      message: `Successfully appended ${newLeads.length} new leads`,
+      addedCount: newLeads.length,
+      totalCount: sheet.data.length
+    });
+  } catch (error) {
+    console.error('Error appending leads:', error);
+    res.status(500).json({ message: 'Error appending leads', error: error.message });
+  }
+};
+
+export { 
+  getAllSheets, 
+  getSheetData, 
+  createSheet, 
+  uploadExcel, 
+  deleteSheet, 
+  addLead, 
+  deleteLead, 
+  updateLeadState,
+  appendLeads,  // Add this
+  fetchSheetUrl, 
+  getExcelData 
+};

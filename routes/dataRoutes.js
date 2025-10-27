@@ -8,9 +8,10 @@ import {
   addLead,
   deleteLead,
   updateLeadState,
+  appendLeads,  // Add this
   fetchSheetUrl,
   getExcelData
-} from '../controllers/dataController.js';
+} from '../controllers/dataController.js';` `
 
 const router = express.Router();    
 
@@ -25,6 +26,7 @@ router.delete('/deleteSheet/:sheetId', deleteSheet); // Delete sheet
 router.post('/addLead/:sheetId', addLead); // Add lead to sheet
 router.delete('/deleteLead/:sheetId/:leadId', deleteLead); // Delete lead from sheet
 router.patch('/updateLeadState/:sheetId/:leadId', updateLeadState); // Update lead state
+router.post('/appendLeads', appendLeads); // Append new leads (for refresh)
 
 // Utility
 router.post('/fetchSheetData', fetchSheetUrl); // Fetch data from URL
